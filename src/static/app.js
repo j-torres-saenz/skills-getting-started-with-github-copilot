@@ -7,11 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
+      console.log("Fetching activities from API...");
       const response = await fetch("/activities");
       const activities = await response.json();
+      console.log("Received activities:", activities);
 
       // Clear loading message
       activitiesList.innerHTML = "";
+
+      // Clear activity select dropdown (keep the default option)
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -106,7 +111,14 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.className = "success";
         signupForm.reset();
         // Refresh activities to show the new participant
-        fetchActivities();
+        try {
+          console.log("Refreshing activities after signup...");
+          await fetchActivities();
+          console.log("Activities refreshed successfully");
+        } catch (refreshError) {
+          console.error("Error refreshing activities:", refreshError);
+          // Still show success message even if refresh fails
+        }
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
